@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.4)
-project(map)
+project(libmap)
+set(map_VERSION_MAJOR 0)
+set(map_VERSION_MINOR 1)
+set(map_VERSION_PATCH 0)
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/include/config.h
+    ${CMAKE_BINARY_DIR}/include/config.h
+)
 
 set_property(GLOBAL PROPERTY CXX_STANDARD 11)
 set_property(GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
@@ -10,12 +18,20 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/lib/catch/single_include/
 )
 set(SOURCES
-    ${CMAKE_SOURCE_DIR}/src/treemap.cc
 )
 set(HEADERS
-    ${CMAKE_SOURCE_DIR}/include/treemap.h
+    ${CMAKE_SOURCE_DIR}/include/rb_node.h
+    ${CMAKE_SOURCE_DIR}/include/config.h
 )
-MESSAGE(STATUS ${HEADERS})
+set(TEST_SOURCES
+    ${CMAKE_SOURCE_DIR}/test/test_main.cc
+)
 
-add_library(libmap SHARED ${SOURCES} ${HEADERS})
+add_library(map SHARED ${SOURCES} ${HEADERS})
+SET_TARGET_PROPERTIES(map PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(maptest ${TEST_SOURCES} ${HEADERS})
+SET_TARGET_PROPERTIES(maptest PROPERTIES LINKER_LANGUAGE CXX)
+TARGET_LINK_LIBRARIES(maptest map)
 enable_testing(true)
+add_test(maptest_all maptest)

@@ -28,3 +28,11 @@
 *.app
 
 build/
+*.py[cod]
+
+# Vim gitignore
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
