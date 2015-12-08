@@ -36,3 +36,4 @@ build/
 Session.vim
 .netrwhist
 *~
+*.swp
