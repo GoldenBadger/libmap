@@ -22,6 +22,7 @@ set(SOURCES
 set(HEADERS
     ${CMAKE_SOURCE_DIR}/include/rb_node.h
     ${CMAKE_SOURCE_DIR}/include/rb_tree.h
+    ${CMAKE_SOURCE_DIR}/include/rb_iterator.h
     ${CMAKE_SOURCE_DIR}/include/config.h
 )
 set(TEST_SOURCES

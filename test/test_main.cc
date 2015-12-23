@@ -3,3 +3,4 @@
 
 #include "rb_node_test.inc"
 #include "rb_tree_test.inc"
+#include "rb_iterator_test.inc"

@@ -2,50 +2,40 @@
 #define LIBMAP_INCLUDE_RB_TREE_H_
 
 #include "rb_node.h"
+#include "rb_iterator.h"
+
+namespace libmap {
+namespace rb_tree {
 
 template <typename T>
 class Tree {
  public:
+  ~Tree() { delete root_; }
+
   void Insert(T data) {
-    root = Insert(root, data);
-    root->colour = BLACK;
+    root_ = Insert(root_, data, nullptr);
+    root_->colour = BLACK;
   }
 
-  bool Contains(T data) const { return Contains(root, data); }
+  bool Contains(T data) const { return Contains(root_, data); }
 
-  static Node<T>* RotateLeft(Node<T>* node) {
-    auto* pivot = node->right;
-    node->right = pivot->left;
-    pivot->left = node;
-    pivot->colour = node->colour;
-    node->colour = RED;
-    return pivot;
+  Iterator<T> begin() const {
+    auto iter_node = root_;
+    while (iter_node->left) iter_node = iter_node->left;
+    return Iterator<T>(iter_node);
   }
 
-  static Node<T>* RotateRight(Node<T>* node) {
-    auto* pivot = node->left;
-    node->left = pivot->right;
-    pivot->right = node;
-    pivot->colour = node->colour;
-    node->colour = RED;
-    return pivot;
-  }
-
-  static void FlipColours(Node<T>* node) {
-    node->colour = RED;
-    node->left->colour = BLACK;
-    node->right->colour = BLACK;
-  }
+  Iterator<T> end() { return nullptr; }
 
  private:
-  Node<T>* Insert(Node<T>* node, T data) {
-    if (node == nullptr) return new Node<T>(data);
+  Node<T>* Insert(Node<T>* node, T data, Node<T>* parent) {
+    if (node == nullptr) return new Node<T>(data, parent);
 
     int compare = (node->data < data);
     if (compare < 0) {
-      node->left = Insert(node->left, data);
+      node->left = Insert(node->left, data, node);
     } else if (compare > 0) {
-      node->right = Insert(node->right, data);
+      node->right = Insert(node->right, data, node);
     } else {
       node->data = data;
     }
@@ -77,7 +67,44 @@ class Tree {
     return node->colour == RED;
   }
 
-  Node<T>* root;
+  // Makes sure that node's children know it is their parent.
+  static void MakeParent(Node<T>* node) {
+    if (node->left) node->left->parent = node;
+    if (node->right) node->right->parent = node;
+  }
+
+  static Node<T>* RotateRight(Node<T>* node) {
+    auto* pivot = node->left;
+    node->left = pivot->right;
+    pivot->right = node;
+    pivot->colour = node->colour;
+    node->colour = RED;
+    MakeParent(node);
+    MakeParent(pivot);
+    return pivot;
+  }
+
+  static Node<T>* RotateLeft(Node<T>* node) {
+    auto* pivot = node->right;
+    node->right = pivot->left;
+    pivot->left = node;
+    pivot->colour = node->colour;
+    node->colour = RED;
+    MakeParent(node);
+    MakeParent(pivot);
+    return pivot;
+  }
+
+  static void FlipColours(Node<T>* node) {
+    node->colour = RED;
+    node->left->colour = BLACK;
+    node->right->colour = BLACK;
+  }
+
+  Node<T>* root_ = nullptr;
 };
+
+}  // namespace rb_tree
+}  // namespace libmap
 
 #endif
